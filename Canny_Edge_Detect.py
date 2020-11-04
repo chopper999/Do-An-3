@@ -1,4 +1,4 @@
-# import the necessary packages
+
 import numpy as np
 import argparse
 import glob
@@ -6,7 +6,6 @@ import cv2
 import imutils
 
 class Auto_Canny():
-
 	def auto_canny( self, image, sigma=0.33):
 		v = np.median(image)
 		lower = int(max(0, (1.0 - sigma) * v))
@@ -36,7 +35,9 @@ class Canny_Detect():
 
 
 	def get_egde(self,path):
+
 		au = Auto_Canny()
+
 		for imagePath in glob.glob(path):
 			image = cv2.imread(imagePath)
 			# image = imutils.resize(image, width=600)
