@@ -18,7 +18,7 @@ class Canny_Detect():
 
 	def show(self, path):
 		au = Auto_Canny()
-		for imagePath in glob.glob(path):
+		for imagePath in glob.glob(path):		#glob duyệt qua các thư mục (nếu có)
 			image = cv2.imread(imagePath)
 			image = imutils.resize(image, width=600)
 			gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -30,6 +30,8 @@ class Canny_Detect():
 			# show
 			cv2.imshow("Original", image)
 			cv2.imshow("Edges", np.hstack([wide]))
+			cv2.imshow("Edges2", np.hstack([tight]))
+			cv2.imshow("Edges3", auto)
 			
 			cv2.waitKey(0)
 
@@ -48,6 +50,6 @@ class Canny_Detect():
 			self.tight = cv2.Canny(blurred, 225, 250)
 			self.auto = au.auto_canny(blurred)
 
-			return np.hstack([self.wide])
+			return self.auto
 			
 

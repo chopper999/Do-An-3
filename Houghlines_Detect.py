@@ -11,7 +11,7 @@ class hough_detect():
     def run(self):
 
         ca = Canny_Detect()
-        
+
         img = cv2.imread(self.path)
 
         edges = ca.get_egde(self.path)
