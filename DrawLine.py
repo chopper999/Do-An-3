@@ -6,13 +6,13 @@ import imageio
 import cv2
 from Moto_Detect import detect_moto
 import numpy as np
-
+from xuly import xulys
 
 
 
 class Window(Frame):
     def __init__(self, master=None):
-        # master: para của tk - dùng để vẽ UI
+
         Frame.__init__(self, master)
         self.master = master
         self.pos = []
@@ -36,7 +36,7 @@ class Window(Frame):
         menu.add_cascade(label = "Menu",menu = file)
 
         # # add hình nền
-        self.filename = "images/preview.jpg"
+        self.filename = "images/bg.jpg"
         self.imgSize = Image.open(self.filename)
         self.tkimage =  ImageTk.PhotoImage(self.imgSize) #Tham số truyền vào cho ImageTk là image
         self.w, self.h = (1366, 768)
@@ -47,6 +47,7 @@ class Window(Frame):
         self.canvas.create_image(20, 20, image=self.tkimage, anchor='nw')
 
         self.canvas.pack() #load các wiget lên parent wiget
+
 
     def open_file(self):
         self.filename = filedialog.askopenfilename()
@@ -66,6 +67,9 @@ class Window(Frame):
         # goi ham ve 2 diem
         root.config(cursor="target") 
         self.canvas.bind("<Button-1>", self.imgClick)
+
+
+
     def client_exit(self):
         exit()
 
@@ -118,27 +122,7 @@ class Window(Frame):
         self.canvas.pack()
 
 
-    def preprocess_input(self, image, net_h, net_w):
-        new_h, new_w, _ = image.shape
 
-        # determine the new size of the image
-        if (float(net_w)/new_w) < (float(net_h)/new_h):
-            new_h = (new_h * net_w)/new_w
-            new_w = net_w
-        else:
-            new_w = (new_w * net_h)/new_h
-            new_h = net_h
-
-        # resize the image to the new size
-        resized = cv2.resize(image[:,:,::-1]/255., (int(new_w), int(new_h)))
-
-        # embed the image into the standard letter box
-        new_image = np.ones((net_h, net_w, 3)) * 0.5
-        new_image[int((net_h-new_h)//2):int((net_h+new_h)//2), int((net_w-new_w)//2):int((net_w+new_w)//2), :] = resized
-        new_image = np.expand_dims(new_image, 0)
-
-        return new_image
-    net_h, net_w = 416, 416
     def main_process(self):
 
         video_src = self.filename
@@ -150,24 +134,20 @@ class Window(Frame):
         writer = imageio.get_writer('output\output1.mp4', fps = fps)
             
         j = 1
-
-
-
         while True:
-            ret, image1 = cap.read()
-            if (type(image1) == type(None)):
+            ret, frame1 = cap.read()
+            if (type(frame1) == type(None)):
                 writer.close()
                 break
-
             
-            # new_image = self.preprocess_input(image1, self.net_h, self.net_w)
+            #xl = xulys(frame1)
+            #new_image = xl.preprocess_input()
 
-            # det = detect_moto(image1)
-            # image1 = det.run(image1)
-            #hihic
-            writer.append_data(image1)
+            det = detect_moto(frame1)
+            frame1 = det.run()
 
-            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
+            writer.append_data(frame1)
+            cv2.imshow('Nhan dien xe vi pham vuot vach den do', frame1)
             
             print(j)
 
