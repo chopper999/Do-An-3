@@ -164,7 +164,7 @@ class Window(Frame):
 
             # det = detect_moto(image1)
             # image1 = det.run(image1)
-            
+            #hihihihh
             writer.append_data(image1)
 
             cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
