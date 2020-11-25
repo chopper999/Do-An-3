@@ -162,8 +162,8 @@ class Window(Frame):
             
             # new_image = self.preprocess_input(image1, self.net_h, self.net_w)
 
-            det = detect_moto(image1)
-            image1 = det.run(image1)
+            # det = detect_moto(image1)
+            # image1 = det.run(image1)
             
             writer.append_data(image1)
 
