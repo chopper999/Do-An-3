@@ -161,7 +161,7 @@ class Window(Frame):
 
             
             # new_image = self.preprocess_input(image1, self.net_h, self.net_w)
-
+            # haaaa
             # det = detect_moto(image1)
             # image1 = det.run(image1)
             
