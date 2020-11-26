@@ -36,7 +36,7 @@ class Window(Frame):
         menu.add_cascade(label = "Menu",menu = file)
 
         # # add hình nền
-        self.filename = "images/preview.jpg"
+        self.filename = "images/3.jpg"
         self.imgSize = Image.open(self.filename)
         self.tkimage =  ImageTk.PhotoImage(self.imgSize) #Tham số truyền vào cho ImageTk là image
         self.w, self.h = (1366, 768)
@@ -55,7 +55,7 @@ class Window(Frame):
 
         reader = imageio.get_reader(self.filename) #Đọc tệp  imageio.get_reader(filename, format, mode)
 
-        fps = reader.get_meta_data()['fps']  # lấy data meta ????
+        fps = reader.get_meta_data()['fps']
 
         ret, image = cap.read()
         
@@ -117,28 +117,6 @@ class Window(Frame):
         self.canvas.create_image(0, 0, image=self.tkimage, anchor='nw')
         self.canvas.pack()
 
-
-    def preprocess_input(self, image, net_h, net_w):
-        new_h, new_w, _ = image.shape
-
-        # determine the new size of the image
-        if (float(net_w)/new_w) < (float(net_h)/new_h):
-            new_h = (new_h * net_w)/new_w
-            new_w = net_w
-        else:
-            new_w = (new_w * net_h)/new_h
-            new_h = net_h
-
-        # resize the image to the new size
-        resized = cv2.resize(image[:,:,::-1]/255., (int(new_w), int(new_h)))
-
-        # embed the image into the standard letter box
-        new_image = np.ones((net_h, net_w, 3)) * 0.5
-        new_image[int((net_h-new_h)//2):int((net_h+new_h)//2), int((net_w-new_w)//2):int((net_w+new_w)//2), :] = resized
-        new_image = np.expand_dims(new_image, 0)
-
-        return new_image
-    net_h, net_w = 416, 416
     def main_process(self):
 
         video_src = self.filename
@@ -159,15 +137,12 @@ class Window(Frame):
                 writer.close()
                 break
 
-            
-            # new_image = self.preprocess_input(image1, self.net_h, self.net_w)
-
             det = detect_moto(image1)
-            image1 = det.run(image1)
-            
-            writer.append_data(image1)
+            image2 = det.run(self.line)
 
-            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
+            writer.append_data(image2)
+
+            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image2)
             
             print(j)
 
