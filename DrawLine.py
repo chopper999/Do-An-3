@@ -36,7 +36,7 @@ class Window(Frame):
         menu.add_cascade(label = "Menu",menu = file)
 
         # # add hình nền
-        self.filename = "images/preview.jpg"
+        self.filename = "images/3.jpg"
         self.imgSize = Image.open(self.filename)
         self.tkimage =  ImageTk.PhotoImage(self.imgSize) #Tham số truyền vào cho ImageTk là image
         self.w, self.h = (1366, 768)
@@ -55,7 +55,7 @@ class Window(Frame):
 
         reader = imageio.get_reader(self.filename) #Đọc tệp  imageio.get_reader(filename, format, mode)
 
-        fps = reader.get_meta_data()['fps']  # lấy data meta ????
+        fps = reader.get_meta_data()['fps']
 
         ret, image = cap.read()
         
@@ -159,15 +159,12 @@ class Window(Frame):
                 writer.close()
                 break
 
-            
-            # new_image = self.preprocess_input(image1, self.net_h, self.net_w)
-            # haaaa
-            # det = detect_moto(image1)
-            # image1 = det.run(image1)
-            #hihihihh
-            writer.append_data(image1)
+            det = detect_moto(image1)
+            image2 = det.run(self.line)
 
-            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
+            writer.append_data(image2)
+
+            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image2)
             
             print(j)
 
