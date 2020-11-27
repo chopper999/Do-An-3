@@ -117,6 +117,19 @@ class Window(Frame):
         self.canvas.create_image(0, 0, image=self.tkimage, anchor='nw')
         self.canvas.pack()
 
+    def main_process(self):
+
+        video_src = self.filename
+
+        cap = cv2.VideoCapture(video_src)
+        # convert to a Movie
+        reader = imageio.get_reader(video_src)
+        fps = reader.get_meta_data()['fps']    
+        writer = imageio.get_writer('output\output1.mp4', fps = fps)
+            
+        j = 1
+
+
 
         while True:
             ret, image1 = cap.read()
