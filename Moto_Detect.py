@@ -139,30 +139,34 @@ class detect_moto():
 		if len(idxs) > 0:
 
 			for i in idxs.flatten():
-				if LABELS[classIDs[i]] == "motorbike":
+				try:
+					if LABELS[classIDs[i]] == "motorbike":
 					# extract the bounding box 
-					(x, y) = (boxes[i][0], boxes[i][1])
-					(w, h) = (boxes[i][2], boxes[i][3])
-					# draw a bounding box
+						(x, y) = (boxes[i][0], boxes[i][1])
+						(w, h) = (boxes[i][2], boxes[i][3])
+						# draw a bounding box
 
-					# highlight box with intersection = true
-					(rxmin, rymin) = (x, y)
-					(rxmax, rymax) = (x+w, y+h)
-					tf = False
-					tf |= self.intersection(line[0], line[1], (rxmin, rymin), (rxmin, rymax))
-					tf |= self.intersection(line[0], line[1], (rxmax, rymin), (rxmax, rymax))
-					tf |= self.intersection(line[0], line[1], (rxmin, rymin), (rxmax, rymin))
-					tf |= self.intersection(line[0], line[1], (rxmin, rymax), (rxmax, rymax))
+						# highlight box with intersection = true
+						(rxmin, rymin) = (x, y)
+						(rxmax, rymax) = (x+w, y+h)
+						tf = False
+						tf |= self.intersection(line[0], line[1], (rxmin, rymin), (rxmin, rymax))
+						tf |= self.intersection(line[0], line[1], (rxmax, rymin), (rxmax, rymax))
+						tf |= self.intersection(line[0], line[1], (rxmin, rymin), (rxmax, rymin))
+						tf |= self.intersection(line[0], line[1], (rxmin, rymax), (rxmax, rymax))
 
-					if tf:
-						color = (255,0,0)
-					else: 
-						color = [int(c) for c in COLORS[classIDs[i]]]
-					cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
+						if tf:
+							color = (255,0,0)
+						else: 
+							color = [int(c) for c in COLORS[classIDs[i]]]
+						cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
 
-					text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
-					cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
-						0.5, color, 2)
+						text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
+						cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+							0.5, color, 2)
+				except: 
+					pass
+				
 		return image				
 		#cv2.imshow("Image", image)
 		#cv2.waitKey(0)
