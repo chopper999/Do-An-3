@@ -132,23 +132,23 @@ class Window(Frame):
 
 
         while True:
-            ret, image1 = cap.read()
-            if (type(image1) == type(None)):
-                writer.close()
-                break
+            if j%10 == 0:
+                ret, image1 = cap.read()
+                if (type(image1) == type(None)):
+                    writer.close()
+                    break
+                det = detect_moto(image1)
+                image1 = det.run(self.line)
 
-            det = detect_moto(image1)
-            image2 = det.run(self.line)
+                writer.append_data(image1)
 
-            writer.append_data(image2)
+                cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
+                
+                print(j)
 
-            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image2)
-            
-            print(j)
-
-            if cv2.waitKey(10) & 0xFF == ord('q'):
-                writer.close()
-                break
+                if cv2.waitKey(10) & 0xFF == ord('q'):
+                    writer.close()
+                    break
 
             j = j+1
 
