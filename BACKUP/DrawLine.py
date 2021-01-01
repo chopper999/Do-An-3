@@ -23,28 +23,24 @@ class Window(Frame):
         self.counter = 0
         self.stopp = True
 
-        #tạo menu
         menu = Menu(self.master)
-        self.master.config(menu=menu)
+        btn1 = Button(self.master, text='ACTION', fg="green", command = self.client_clickaction)
+        btn2 = Button(self.master, text='CANCEL', fg="red", command = self.client_clickcancel)
+        self.master.config(menu=menu) # Tạo giao diện menu của tk
         
+
         # # add menu item
         file = Menu(menu)
         file.add_command(label="Open", command=self.open_file)
         file.add_command(label="Exit", command=self.client_exit)
         menu.add_cascade(label = "Menu",menu = file)
 
-        #tạo button
-        btn1 = Button(self.master, text='ĐÈN ĐỎ', fg="red", command = self.client_clickred)
-        btn2 = Button(self.master, text='ĐÈN XANH', fg="green", command = self.client_clickgreen)
-        btn3 = Button(self.master, text='BẮT ĐẦU', fg="green", command = self.main_process)
-        
         btn2.pack(side=RIGHT)
-        btn1.pack(side=RIGHT, padx=5, pady=5)
-        btn3.pack(side=RIGHT, padx=5, pady=5)
+        btn1.pack(side=RIGHT, padx=5, pady=5)\
 
+        self.panel = None
+        
 
-
-      
         # # add hình nền
         self.filename = "images/3.jpg"
         self.imgSize = Image.open(self.filename)
@@ -58,27 +54,30 @@ class Window(Frame):
 
     def open_file(self):
         self.filename = filedialog.askopenfilename()
+
         cap = cv2.VideoCapture(self.filename)
+
         reader = imageio.get_reader(self.filename)
+
         fps = reader.get_meta_data()['fps']
+
         ret, image = cap.read()
         
         # show frame[0] của video đầu vào để vẽ đường thẳng
         cv2.imwrite('images\image0.jpg', image)
         self.show_image('images\image0.jpg')
 
-        root.config(cursor="target")
-
+        root.config(cursor="target") 
         self.canvas.bind("<Button-1>", self.imgClick)
 
 
     def client_exit(self):
         exit()
 
-    def client_clickred(self):
+    def client_clickaction(self):
         self.stopp = True
 
-    def client_clickgreen(self):
+    def client_clickcancel(self):
         self.stopp = False
 
 
@@ -107,8 +106,8 @@ class Window(Frame):
             #self.main_process() 
             
             #clearing things
-            #self.line.clear()
-            #self.rect.clear()
+            self.line.clear()
+            self.rect.clear()
             for i in self.pos:
                 self.canvas.delete(i)
 
@@ -123,39 +122,27 @@ class Window(Frame):
         self.canvas.create_image(0, 0, image=self.tkimage, anchor='nw')
         self.canvas.pack()
 
-
-    def show_frame(self, frame):
-
-        #Graphics window
-        imageFrame = Frame(master = root, width=600, height=500)
-        imageFrame.grid(row=0, column=0, padx=10, pady=2)
-
-
-        display1 = Label(imageFrame)
-        display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
-
-        self.frame = frame
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-        img = Image.fromarray(cv2image)
-        imgtk = ImageTk.PhotoImage(image=img)
-        display1.imgtk = imgtk #Shows frame for display 1
-        display1.configure(image=imgtk)
-        window.after(10, show_frame) 
-
-
     def main_process(self):
 
         video_src = self.filename
 
+        labelsPath = os.path.sep.join(["yolo-coco", "coco1.names"])
+        LABELS = open(labelsPath).read().strip().split("\n")
+
+
+        np.random.seed(42)
+        COLORS = np.random.randint(0, 255, size=(len(LABELS), 3),
+            dtype="uint8")
+
+
         weightsPath = os.path.sep.join(["yolo-coco", "yolov3.weights"])
         configPath = os.path.sep.join(["yolo-coco", "yolov3.cfg"])
 
+
         print("[INFO] loading DATA YOLO ...")
         net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
-
-
         cap = cv2.VideoCapture(video_src)
-
+        # convert to a Movie
         reader = imageio.get_reader(video_src)
         fps = reader.get_meta_data()['fps']    
         writer = imageio.get_writer('output\output1.mp4', fps = fps)
@@ -171,7 +158,6 @@ class Window(Frame):
                 image1 = det.run(self.line, net, self.stopp)
 
                 writer.append_data(image1)
-
                 cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
 
                 if cv2.waitKey(10) & 0xFF == ord('q'):
@@ -182,9 +168,9 @@ class Window(Frame):
 
         cv2.destroyAllWindows()
 
+
 root = Tk()
 app = Window(root)
-root.geometry("%dx%d"%(1080, 720))
+root.geometry("%dx%d"%(1280, 720))
 root.title("Nhan dien xe vi pham")
-
 root.mainloop()
