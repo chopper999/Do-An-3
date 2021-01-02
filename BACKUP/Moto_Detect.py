@@ -9,6 +9,7 @@ class detect_moto():
 	def __init__(self, img):
 		self.img = img
 
+
 	def intersection(self,p, q, r, t):
 		#print(p,q,r,t)
 		(x1, y1) = p
@@ -54,6 +55,7 @@ class detect_moto():
 		else:
 			return False
 
+
 	def run(self, line, net, stopp):
 		self.net = net
 		self.stopp = stopp
@@ -70,6 +72,8 @@ class detect_moto():
 			image = self.img
 		except:
 			print("Can not read image")
+		# image = cv2.imread(img)
+
 
 		(H, W) = image.shape[:2]
 
