@@ -1,7 +1,7 @@
 from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import filedialog
-
+import threading
 import imageio
 import cv2
 from Moto_Detect import detect_moto
@@ -17,6 +17,9 @@ class Window(Frame):
         self.line = []
         self.rect = []
         self.master.title("GUI")
+        #threading
+        self.thread = None
+        self.stopEvent = None
 
         self.pack(fill=BOTH, expand=1) 
 
@@ -26,11 +29,18 @@ class Window(Frame):
         #tạo menu
         menu = Menu(self.master)
         self.master.config(menu=menu)
+
+        #Threading
+        self.stopEvent = threading.Event()
+        self.thread = threading.Thread(target=self.open_file, args=())
+        self.thread.start()
         
         # # add menu item
         file = Menu(menu)
         file.add_command(label="Open", command=self.open_file)
         file.add_command(label="Exit", command=self.client_exit)
+        file.add_command(label="GREEN", command= self.client_clickgreen)
+        file.add_command(label="RED", command=self.client_clickred)
         menu.add_cascade(label = "Menu",menu = file)
 
         #tạo button
@@ -73,6 +83,7 @@ class Window(Frame):
 
 
     def client_exit(self):
+        self.stopEvent.set()
         exit()
 
     def client_clickred(self):
@@ -161,7 +172,7 @@ class Window(Frame):
         writer = imageio.get_writer('output\output1.mp4', fps = fps)
             
         j = 1
-        while True:
+        while True():
             if j%10 == 0:
                 ret, image1 = cap.read()
                 if (type(image1) == type(None)):
