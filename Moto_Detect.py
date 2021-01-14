@@ -63,8 +63,8 @@ class detect_moto():
 		self.net = net
 		self.stopp = False
 		self.fps = fps
+
 		de_co = detect_color()
-		
 		traffic_lights = de_co.det_color(img, 640, 480)
 		print(traffic_lights)
 		if traffic_lights == "red":
@@ -167,6 +167,6 @@ class detect_moto():
 				except: 
 					pass
 				
-		return image,secs
+		return image, secs , traffic_lights
 
 	

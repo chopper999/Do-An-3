@@ -35,17 +35,17 @@ class Window(Frame):
         menu.add_cascade(label = "Menu",menu = file)
 
         #tạo button
-        btn1 = Button(self.master, text='ĐÈN ĐỎ', fg="red", command = self.client_clickred)
-        btn2 = Button(self.master, text='ĐÈN XANH', fg="green", command = self.client_clickgreen)
+        #btn1 = Button(self.master, text='ĐÈN ĐỎ', fg="red", command = self.client_clickred)
+        #btn2 = Button(self.master, text='ĐÈN XANH', fg="green", command = self.client_clickgreen)
         btn3 = Button(self.master, text='BẮT ĐẦU', fg="green", command = self.main_process)
 
-        inputtxt = Text(self.master, height = 1, 
-                width = 10, 
-                bg = "light yellow")
+        #inputtxt = Text(self.master, height = 1, 
+        #        width = 10, 
+        #        bg = "light yellow")
 
-        inputtxt.pack(side=RIGHT)
-        btn2.pack(side=RIGHT)
-        btn1.pack(side=RIGHT, padx=5, pady=5)
+        #inputtxt.pack(side=RIGHT)
+        #btn2.pack(side=RIGHT)
+        #btn1.pack(side=RIGHT, padx=5, pady=5)
         btn3.pack(side=RIGHT, padx=5, pady=5)
 
 
@@ -183,12 +183,14 @@ class Window(Frame):
                 break
             index = X
 
-            image1, secs = det.run(self.line,image1, net, fps)
+            image1, secs, tran = det.run(self.line,image1, net, fps)
             X = round(secs + index, 2)
             det.setsecs(X)
             a = det.getsecs()
+
+            cv2.putText(image1, "traffic lights: " + str(tran), (100,20), cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,(255,0,0), 2)
             
-            print(a)
             result.write(image1)
 
             cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)

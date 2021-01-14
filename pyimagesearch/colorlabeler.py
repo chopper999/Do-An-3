@@ -11,7 +11,9 @@ class ColorLabeler:
 		colors = OrderedDict({
 			"red": (255, 0, 0),
 			"green": (0, 255, 0),
-			"yellow": (255, 255, 0)})
+			"yellow": (255, 255, 0),
+			"black" :(0, 0, 0)
+			})
 
 		# allocate memory for the L*a*b* image, then initialize
 		# the color names list
