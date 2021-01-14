@@ -1,42 +1,23 @@
+from tkinter import *
+import cv2.cv as cv
 
-import numpy as np
-import cv2
-import tkinter as tk
-from PIL import Image, ImageTk
+root = Tk()
 
-#Set up GUI
-window = tk.Tk()  #Makes main window
-window.wm_title("Digital Microscope")
-window.config(background="#FFFFFF")
+w = Canvas(root, width=500, height=300, bd = 10, bg = 'white')
+w.grid(row = 0, column = 0, columnspan = 2)
 
-#Graphics window
-imageFrame = tk.Frame(window, width=600, height=500)
-imageFrame.grid(row=0, column=0, padx=10, pady=2)
+b = Button(width = 10, height = 2, text = 'Button1')
+b.grid(row = 1, column = 0)
+b2 = Button(width = 10, height = 2, text = 'Button2')
+b2.grid(row = 1,column = 1)
 
-#Capture video frames
+cv.NamedWindow("camera",1)
+capture = cv.CaptureFromCAM(0)
 
-cap = cv2.VideoCapture(0)
+while True:
+    img = cv.QueryFrame(capture)
+    canvas.create_image(0,0, image=img)
+    if cv.WaitKey(10) == 27:
+        break
 
-def show_frame():
-    _, frame = cap.read()
-    frame = cv2.flip(frame, 1)
-    cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-    img = Image.fromarray(cv2image)
-    imgtk = ImageTk.PhotoImage(image=img)
-    display1.imgtk = imgtk #Shows frame for display 1
-    display1.configure(image=imgtk)
-    display2.imgtk = imgtk #Shows frame for display 2
-    display2.configure(image=imgtk)
-    window.after(10, show_frame) 
-
-display1 = tk.Label(imageFrame)
-display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
-display2 = tk.Label(imageFrame)
-display2.grid(row=0, column=0) #Display 2
-
-#Slider window (slider controls stage position)
-sliderFrame = tk.Frame(window, width=600, height=100)
-sliderFrame.grid(row = 600, column=0, padx=10, pady=2)
-
-#show_frame() #Display
-window.mainloop()  #Starts GUI
+root.mainloop()

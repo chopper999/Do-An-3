@@ -1,14 +1,12 @@
-
 import numpy as np
 import argparse
 import time
 import cv2
 import os
+from detect_color import detect_color
 
 class detect_moto():
-	def __init__(self, img):
-		self.img = img
-
+	#def __init__(self):
 	def intersection(self,p, q, r, t):
 		#print(p,q,r,t)
 		(x1, y1) = p
@@ -54,9 +52,25 @@ class detect_moto():
 		else:
 			return False
 
-	def run(self, line, net, stopp):
+	def setsecs(self, sec):
+		self.sec = sec
+
+	def getsecs(self):
+		return self.sec
+
+	def run(self, line, img, net, fps):
+		self.img = img
 		self.net = net
-		self.stopp = stopp
+		self.stopp = False
+		self.fps = fps
+		de_co = detect_color()
+		
+		traffic_lights = de_co.det_color(img, 640, 480)
+		print(traffic_lights)
+		if traffic_lights == "red":
+			self.stopp = True
+		else:
+			self.stopp = False
 
 		labelsPath = os.path.sep.join(["yolo-coco", "coco.names"])
 		LABELS = open(labelsPath).read().strip().split("\n")
@@ -82,19 +96,16 @@ class detect_moto():
 		start = time.time()
 		layerOutputs = net.forward(ln)
 		end = time.time()
-
+		secs = round((end-start)/fps, 2)
 
 		print("[INFO] Time load Frame: {:.6f} seconds".format(end - start))
-
 
 		boxes = []
 		confidences = []
 		classIDs = []
 
 		for output in layerOutputs:
-
 			for detection in output:
-
 				scores = detection[5:]
 				classID = np.argmax(scores)
 				confidence = scores[classID]
@@ -114,7 +125,6 @@ class detect_moto():
 
 		idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)	#0.3: threshold when applyong non-maxima suppression
 
-
 		if len(idxs) > 0:
 
 			for i in idxs.flatten():
@@ -125,8 +135,7 @@ class detect_moto():
 						(w, h) = (boxes[i][2], boxes[i][3])
 						# draw a bounding box
 						tf = False
-						if stopp == True:
-							# highlight box with intersection = true
+						if self.stopp == True:
 							(rxmin, rymin) = (x, y)
 							(rxmax, rymax) = (x+w, y+h)
 
@@ -141,12 +150,23 @@ class detect_moto():
 							color = [int(c) for c in COLORS[classIDs[i]]]
 						cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
 
+						# center_coordinates = (round((x/2) + ((x+w)/2)),round((y/2)+((y+h)/2)))
+						# axesLength = (round(w/2), round(h/2))
+						# angle = 0
+						# startAngle = 0
+						# endAngle = 360
+						# cv2.ellipse(image, center_coordinates, axesLength, 
+      #      					angle, startAngle, endAngle, color, 2)
+
 						text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
+
 						cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
 							0.5, color, 2)
+						cv2.putText(image, str(self.sec), (20,20), cv2.FONT_HERSHEY_SIMPLEX,
+							0.5,(0,103,107), 2)
 				except: 
 					pass
 				
-		return image
+		return image,secs
 
 	

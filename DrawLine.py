@@ -21,6 +21,7 @@ class Window(Frame):
         self.pack(fill=BOTH, expand=1) 
 
         self.counter = 0
+        self.sec = 0
         self.stopp = True
 
         #tạo menu
@@ -37,14 +38,17 @@ class Window(Frame):
         btn1 = Button(self.master, text='ĐÈN ĐỎ', fg="red", command = self.client_clickred)
         btn2 = Button(self.master, text='ĐÈN XANH', fg="green", command = self.client_clickgreen)
         btn3 = Button(self.master, text='BẮT ĐẦU', fg="green", command = self.main_process)
-        
+
+        inputtxt = Text(self.master, height = 1, 
+                width = 10, 
+                bg = "light yellow")
+
+        inputtxt.pack(side=RIGHT)
         btn2.pack(side=RIGHT)
         btn1.pack(side=RIGHT, padx=5, pady=5)
         btn3.pack(side=RIGHT, padx=5, pady=5)
 
 
-
-      
         # # add hình nền
         self.filename = "images/3.jpg"
         self.imgSize = Image.open(self.filename)
@@ -61,7 +65,9 @@ class Window(Frame):
         cap = cv2.VideoCapture(self.filename)
         reader = imageio.get_reader(self.filename)
         fps = reader.get_meta_data()['fps']
+        
         ret, image = cap.read()
+        
         
         # show frame[0] của video đầu vào để vẽ đường thẳng
         cv2.imwrite('images\image0.jpg', image)
@@ -140,45 +146,56 @@ class Window(Frame):
         imgtk = ImageTk.PhotoImage(image=img)
         display1.imgtk = imgtk #Shows frame for display 1
         display1.configure(image=imgtk)
-        window.after(10, show_frame) 
+        window.after(10, show_frame)
 
 
     def main_process(self):
 
         video_src = self.filename
-
+        secs = 0
+        X = 0
         weightsPath = os.path.sep.join(["yolo-coco", "yolov3.weights"])
         configPath = os.path.sep.join(["yolo-coco", "yolov3.cfg"])
 
         print("[INFO] loading DATA YOLO ...")
         net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 
         cap = cv2.VideoCapture(video_src)
 
+        frame_width = int(cap.get(3)) 
+        frame_height = int(cap.get(4)) 
+        size = (frame_width, frame_height) 
+
         reader = imageio.get_reader(video_src)
         fps = reader.get_meta_data()['fps']    
-        writer = imageio.get_writer('output\output1.mp4', fps = fps)
+        result = cv2.VideoWriter('output/outputvideo.avi',  
+                         cv2.VideoWriter_fourcc(*'MJPG'), 
+                         fps, size)
+
             
-        j = 1
+        det = detect_moto()
         while True:
-            if j%10 == 0:
-                ret, image1 = cap.read()
-                if (type(image1) == type(None)):
-                    writer.close()
-                    break
-                det = detect_moto(image1)
-                image1 = det.run(self.line, net, self.stopp)
+            ret, image1 = cap.read()
+            if (type(image1) == type(None)):
+                break
+            index = X
 
-                writer.append_data(image1)
+            image1, secs = det.run(self.line,image1, net, fps)
+            X = round(secs + index, 2)
+            det.setsecs(X)
+            a = det.getsecs()
+            
+            print(a)
+            result.write(image1)
 
-                cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
+            cv2.imshow('Nhan dien xe vi pham vuot vach den do', image1)
 
-                if cv2.waitKey(10) & 0xFF == ord('q'):
-                    writer.close()
-                    break
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
 
-            j = j+1
 
         cv2.destroyAllWindows()
 
