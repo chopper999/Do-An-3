@@ -1,6 +1,6 @@
 
-from pyimagesearch.shapedetector import ShapeDetector
-from pyimagesearch.colorlabeler import ColorLabeler
+from DetectColorPY.shapedetector import ShapeDetector
+from DetectColorPY.colorlabeler import ColorLabeler
 import argparse
 import imutils
 import cv2
@@ -38,8 +38,8 @@ class detect_color():
 			color = cl.label(lab, c)
 			if color =="red" or color =="green"or color == "yellow":
 				text = "{}".format(color)
-				#cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+				cv2.drawContours(resized, [c], -1, (0, 255, 0), 2)
 
-				#cv2.imshow("Image", resized)
+				cv2.imshow("Image", resized)
 				#cv2.waitKey(0)
 				return text
